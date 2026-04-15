@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboral Master</title>
+    <meta name="theme-color" content="#1e293b">
+    <style>
+        :root {
+            --primary-grad: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            --success-grad: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --empresa-color: #f59e0b;
+            --trabajador-color: #0ea5e9;
+            --bg: #f8fafc;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); padding: 10px; display: flex; flex-direction: column; align-items: center; margin: 0; color: #1e293b; }
+        .container { background: white; max-width: 480px; width: 100%; min-height: 90vh; padding: 20px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); box-sizing: border-box; margin-top: 10px; }
+
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 25px; background: #f1f5f9; padding: 6px; border-radius: 16px; }
+        .nav-btn { flex: 1; padding: 14px 5px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; color: #64748b; background: transparent; transition: 0.3s; font-size: 0.85rem; text-transform: uppercase; }
+        .nav-btn.active { background: white; color: #1e293b; box-shadow: var(--card-shadow); }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        h2 { text-align: center; font-size: 1.4rem; margin-bottom: 20px; color: #1e293b; }
+        
+        .horario-ref { background: #f1f5f9; border-radius: 12px; padding: 10px; margin-bottom: 15px; font-size: 0.8rem; border-left: 4px solid #334155; }
+        .horario-ref span { font-weight: 800; }
+
+        .card { background: #fff; padding: 18px; border-radius: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: var(--card-shadow); }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; color: #475569; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; box-sizing: border-box; font-size: 1rem; background: #f8fafc; font-family: inherit; margin-bottom: 10px; }
+        
+        .progress-container { margin-bottom: 20px; background: #f1f5f9; border-radius: 20px; height: 26px; position: relative; overflow: hidden; border: 1px solid #e2e8f0; }
+        .progress-bar { height: 100%; background: var(--success-grad); width: 0%; transition: width 0.6s ease; }
+        .progress-text { position: absolute; width: 100%; text-align: center; top: 0; line-height: 26px; font-size: 0.75rem; font-weight: 900; color: #1e293b; }
+
+        .row { display: flex; gap: 10px; }
+        .row div { flex: 1; }
+        
+        button { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-add { background: var(--primary-grad); color: white; margin-top: 10px; }
+        .btn-share { background: var(--success-grad); color: white; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        .type-picker { display: flex; gap: 12px; margin-bottom: 15px; }
+        .btn-v { background: #f1f5f9; border: 3px solid transparent; flex: 1; padding: 15px 10px; border-radius: 16px; font-weight: 800; color: #64748b; font-size: 0.85rem; }
+        .btn-v.active-emp { border-color: var(--empresa-color); color: #b45309; background: #fffbeb; }
+        .btn-v.active-trab { border-color: var(--trabajador-color); color: #0369a1; background: #f0f9ff; }
+
+        .vaca-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .vaca-card { padding: 15px; border-radius: 16px; text-align: center; border: 1px solid #e2e8f0; background: #fff; }
+        .vaca-card strong { display: block; font-size: 1.6rem; }
+        .vaca-card span { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+
+        .item-card { background: white; border: 1px solid #f1f5f9; padding: 14px; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #cbd5e1; }
+        .item-note { font-style: italic; color: #94a3b8; font-size: 0.8rem; margin-top: 6px; border-top: 1px dashed #e2e8f0; padding-top: 4px; }
+        .del-btn { background: #fee2e2; color: #ef4444; width: auto; padding: 10px; border-radius: 12px; }
+
+        .backup-section { display: flex; gap: 10px; margin-top: 30px; width: 100%; max-width: 480px; padding-bottom: 20px; }
+        .btn-backup-alt { flex: 1; background: #64748b; color: white; font-size: 0.75rem; height: 45px; opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-tabs">
+        <button id="tabH" class="nav-btn active" onclick="showView('horas')">⏱️ Horas Extras</button>
+        <button id="tabV" class="nav-btn" onclick="showView('vaca')">🌴 Vacaciones</button>
+    </div>
+
+    <div id="view-horas" class="view active">
+        <h2>⏱️ Horas Extras</h2>
+        <div class="horario-ref">
+            <div>⏰ <span>L-J:</span> 07:30 - 16:00 | <span>V:</span> 07:00 - 15:00</div>
+        </div>
+        <div class="card">
+            <label>📅 Fecha</label><input type="date" id="h-fecha">
+            <div class="row">
+                <div><label>📥 Entrada</label><input type="time" id="h-entrada" value="07:30"></div>
+                <div><label>📤 Salida</label><input type="time" id="h-salida" value="17:00"></div>
+            </div>
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; background:#f8fafc; padding:12px; border-radius:12px; border:1px solid #f1f5f9; margin-bottom:10px;">
+                <input type="checkbox" id="h-comida" style="width:18px; height:18px;"> <span>🍽️ Comida (-1h)</span>
+            </label>
+            <textarea id="h-nota" placeholder="Nota opcional..."></textarea>
+            <button class="btn-add" onclick="saveHora()">➕ GUARDAR REGISTRO</button>
+        </div>
+        <div class="row" style="margin-bottom:15px">
+            <select id="h-mes" onchange="renderHoras()"></select>
+            <select id="h-anio" onchange="renderHoras()"></select>
+        </div>
+        <div class="vaca-grid">
+            <div class="vaca-card"><span>Horas Mes</span><strong id="h-sum-h">0.0</strong></div>
+            <div class="vaca-card" style="background:#f0fdf4"><span>Cobro</span><strong id="h-sum-d">0€</strong></div>
+        </div>
+        <button class="btn-share" onclick="shareHoras()">📤 WhatsApp Horas</button>
+        <div id="list-horas" style="margin-top:15px"></div>
+    </div>
+
+    <div id="view-vaca" class="view">
+        <h2>🌴 Mis Vacaciones</h2>
+        <div class="progress-container">
+            <div id="v-progress-bar" class="progress-bar"></div>
+            <div id="v-progress-text" class="progress-text">0 / 22 DÍAS GASTADOS</div>
+        </div>
+        <div class="card">
+            <div class="row">
+                <div><label>📅 Desde</label><input type="date" id="v-desde"></div>
+                <div><label>📅 Hasta</label><input type="date" id="v-hasta"></div>
+            </div>
+            <label>👤 ¿Quién eligió estos días?</label>
+            <div class="type-picker">
+                <button id="v-btn-e" class="btn-v" onclick="vType('empresa')">🏢 EMPRESA</button>
+                <button id="v-btn-t" class="btn-v" onclick="vType('trabajador')">👤 YO</button>
+            </div>
+            <textarea id="v-nota" placeholder="Nota opcional..."></textarea>
+            <button class="btn-add" onclick="saveVaca()">✅ REGISTRAR DÍAS</button>
+        </div>
+        <div class="vaca-grid">
+            <div class="vaca-card" style="border-bottom: 4px solid var(--empresa-color)"><span>🏢 Empresa</span><strong id="v-sum-e">0</strong></div>
+            <div class="vaca-card" style="border-bottom: 4px solid var(--trabajador-color)"><span>👤 Yo</span><strong id="v-sum-t">0</strong></div>
+        </div>
+        <button class="btn-share" onclick="shareVaca()">📤 WhatsApp Vacas</button>
+        <div id="list-vaca" style="margin-top:15px"></div>
+    </div>
+</div>
+
+<div class="backup-section">
+    <button class="btn-backup-alt" onclick="exportBackup()">💾 Exportar</button>
+    <button class="btn-backup-alt" onclick="document.getElementById('importFile').click()">📥 Importar</button>
+    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importBackup(event)">
+</div>
+
+<script>
+    let dbH = JSON.parse(localStorage.getItem('dbH_vFinal')) || [];
+    let dbV = JSON.parse(localStorage.getItem('dbV_vFinal')) || [];
+    let currentVType = '';
+
+    function showView(v) {
+        document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('view-'+v).classList.add('active');
+        v === 'horas' ? document.getElementById('tabH').classList.add('active') : document.getElementById('tabV').classList.add('active');
+    }
+
+    function init() {
+        const hoy = new Date();
+        document.getElementById('h-fecha').valueAsDate = hoy;
+        document.getElementById('v-desde').valueAsDate = hoy;
+        document.getElementById('v-hasta').valueAsDate = hoy;
+        const mSelect = document.getElementById('h-mes');
+        ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"].forEach((m,i) => mSelect.add(new Option(m,i)));
+        mSelect.value = hoy.getMonth();
+        const aSelect = document.getElementById('h-anio');
+        for(let a=hoy.getFullYear(); a>=2024; a--) aSelect.add(new Option(a,a));
+        renderHoras(); renderVaca();
+    }
+
+    // FIX: Usamos T12:00 para evitar saltos de día por zona horaria
+    function getSafeDate(isoString) {
+        return new Date(isoString + 'T12:00:00');
+    }
+
+    function saveHora() {
+        const f = document.getElementById('h-fecha').value, e = document.getElementById('h-entrada').value, 
+              s = document.getElementById('h-salida').value, c = document.getElementById('h-comida').checked,
+              n = document.getElementById('h-nota').value;
+        if(!f || !e || !s) return alert("Faltan datos");
+        
+        const dt = getSafeDate(f);
+        const dia = dt.getDay();
+        let iO = (dia===5) ? "07:00" : "07:30", oO = (dia===5) ? "15:00" : "16:00";
+        if(dia===0 || dia===6) { iO=null; oO=null; }
+        
+        const t2m = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+        const mE = t2m(e), mS = t2m(s);
+        let ex = 0;
+        if(!iO) ex = mS - mE; else {
+            const mOi = t2m(iO), mOo = t2m(oO);
+            if(mE < mOi) ex += (mOi - mE);
+            if(mS > mOo) ex += (mS - mOo);
+        }
+        let total = Math.max(0, ex / 60);
+        if(c) total = Math.max(0, total - 1);
+        dbH.push({ id:Date.now(), f, e, s, total, n });
+        document.getElementById('h-nota').value = '';
+        saveAndRender();
+    }
+
+    function renderHoras() {
+        const m = parseInt(document.getElementById('h-mes').value), a = parseInt(document.getElementById('h-anio').value);
+        const list = document.getElementById('list-horas'); list.innerHTML = '';
+        let sH = 0;
+        dbH.filter(x => { 
+            const d = getSafeDate(x.f); 
+            return d.getMonth()===m && d.getFullYear()===a; 
+        }).sort((a,b) => new Date(a.f) - new Date(b.f)).forEach(x => {
+            sH += x.total;
+            const div = document.createElement('div'); div.className = 'item-card';
+            div.innerHTML = `<div><b>${x.f.split('-').reverse().join('/')}</b><br><small>🕒 ${x.e}-${x.s}</small>
+            ${x.n ? `<div class="item-note">📝 ${x.n}</div>` : ''}</div>
+            <div style="display:flex; align-items:center; gap:10px"><b>+${x.total.toFixed(2)}h</b>
+            <button class="del-btn" onclick="delH(${x.id})">🗑️</button></div>`;
+            list.appendChild(div);
+        });
+        document.getElementById('h-sum-h').innerText = sH.toFixed(2);
+        document.getElementById('h-sum-d').innerText = (sH * 8).toFixed(2) + '€';
+    }
+
+    function vType(t) { 
+        currentVType = t;
+        document.getElementById('v-btn-e').className = 'btn-v'+(t==='empresa'?' active-emp':'');
+        document.getElementById('v-btn-t').className = 'btn-v'+(t==='trabajador'?' active-trab':'');
+    }
+
+    function saveVaca() {
+        const dI = document.getElementById('v-desde').value, hI = document.getElementById('v-hasta').value, n = document.getElementById('v-nota').value;
+        if(!currentVType || !dI || !hI) return alert("Indica quién elige los días");
+        let cur = getSafeDate(dI), fin = getSafeDate(hI);
+        while(cur <= fin) {
+            if(cur.getDay()!==0 && cur.getDay()!==6) {
+                const s = cur.toISOString().split('T')[0];
+                if(!dbV.some(x=>x.f === s)) dbV.push({ id: Math.random(), f: s, t: currentVType, n });
+            }
+            cur.setDate(cur.getDate() + 1);
+        }
+        document.getElementById('v-nota').value = '';
+        saveAndRender();
+    }
+
+    function renderVaca() {
+        const list = document.getElementById('list-vaca'); list.innerHTML = '';
+        let e=0, t=0;
+        dbV.sort((a,b) => new Date(b.f) - new Date(a.f)).forEach(v => {
+            v.t === 'empresa' ? e++ : t++;
+            const div = document.createElement('div'); div.className = 'item-card';
+            div.style.borderLeftColor = v.t==='empresa' ? 'var(--empresa-color)' : 'var(--trabajador-color)';
+            div.innerHTML = `<div><b>${v.f.split('-').reverse().join('/')}</b> <small>${v.t.toUpperCase()}</small>
+            ${v.n ? `<div class="item-note">📝 ${v.n}</div>` : ''}</div>
+            <button class="del-btn" onclick="delV(${v.id})">🗑️</button>`;
+            list.appendChild(div);
+        });
+        const total = e + t;
+        document.getElementById('v-sum-e').innerText = e;
+        document.getElementById('v-sum-t').innerText = t;
+        document.getElementById('v-progress-bar').style.width = Math.min(100, (total/22)*100) + '%';
+        document.getElementById('v-progress-text').innerText = `${total} / 22 DÍAS GASTADOS`;
+    }
+
+    function delH(id) { dbH = dbH.filter(x=>x.id!==id); saveAndRender(); }
+    function delV(id) { dbV = dbV.filter(x=>x.id!==id); saveAndRender(); }
+
+    function saveAndRender() {
+        localStorage.setItem('dbH_vFinal', JSON.stringify(dbH));
+        localStorage.setItem('dbV_vFinal', JSON.stringify(dbV));
+        renderHoras(); renderVaca();
+    }
+
+    async function shareHoras() {
+        let txt = `⏱️ *HORAS EXTRA*\n`;
+        dbH.sort((a,b)=>new Date(a.f)-new Date(b.f)).forEach(x=> txt += `• ${x.f.split('-').reverse().join('/')}: ${x.total.toFixed(2)}h ${x.n?'['+x.n+']':''}\n`);
+        if(navigator.share) await navigator.share({text: txt});
+    }
+
+    async function shareVaca() {
+        let txt = `🏖️ *VACACIONES*\n`;
+        dbV.sort((a,b)=>new Date(a.f)-new Date(b.f)).forEach(v=> txt += `• ${v.f.split('-').reverse().join('/')}: ${v.t} ${v.n?'['+v.n+']':''}\n`);
+        if(navigator.share) await navigator.share({text: txt});
+    }
+
+    function exportBackup() {
+        const blob = new Blob([JSON.stringify({horas:dbH, vacaciones:dbV})], {type:'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup.json'; a.click();
+    }
+
+    function importBackup(ev) {
+        const file = ev.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const data = JSON.parse(e.target.result);
+            dbH = data.horas || []; dbV = data.vacaciones || [];
+            saveAndRender();
+        };
+        reader.readAsText(file);
+    }
+
+    init();
+</script>
+</body>
+</html>
